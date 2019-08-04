@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "./../config";
-import { validateAll } from "indicative";
+const { validateAll } = window;
 
 export default class ArticlesService{
     getArticles = (url = `${config.apiUrl}/articles`) => {
@@ -17,6 +17,19 @@ export default class ArticlesService{
             axios.get(`${config.apiUrl}/article/${slug}`).then(response => {
                 resolve(response.data.data)
             }).catch(error => {
+                reject(error)
+            })
+        })
+    }
+    getUserArticles = (token, url = `${config.apiUrl}/user/articles`) => {
+        return new Promise((resolve, reject) => {
+            axios.get(url,{
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }).then((response) => {
+                resolve(response.data.data)
+            }).catch((error) => {
                 reject(error)
             })
         })
@@ -73,6 +86,75 @@ export default class ArticlesService{
                         }
                     ])
                 }
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+    updateArticle = (data, article, token) => {
+        return new Promise((resolve, reject) => {
+            const rules = {
+                title: 'required',
+                content: 'required',
+                category: 'required'
+            }
+            const messages = {
+                required: 'The {{field}} is required'
+            }
+            validateAll(data, rules, messages).then(() => {
+                if(data.image){
+                    this.uploadToCloudinary(data.image).then((response) => {
+                        axios.put(`${config.apiUrl}/articles/${article.id}`,{
+                            title: data.title,
+                            content: data.content,
+                            category_id: data.category,
+                            imageUrl: response.secure_url
+                        }, {
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        }).then((response) => {
+                            resolve(response.data)
+                        }).catch((error) => {
+                            reject(error.response.data)
+                        })
+                    }).catch((error) => {
+                        reject(error)
+                    })
+                }else{
+                    axios.put(`${config.apiUrl}/articles/${article.id}`,{
+                        title: data.title,
+                        content: data.content,
+                        category_id: data.category,
+                        imageUrl: article.imageUrl
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }).then((response) => {
+                        resolve(response.data)
+                    }).catch((error) => {
+                        reject(error.response.data)
+                    })
+                    // reject([
+                    //     {
+                    //         message: "The image is required"
+                    //     }
+                    // ])
+                }
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+    deleteArticle = (id, token) => {
+        return new Promise((resolve, reject) => {
+            axios.delete(`${config.apiUrl}/articles/${id}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }).then((response) => {
+                resolve(response)
             }).catch((error) => {
                 reject(error)
             })

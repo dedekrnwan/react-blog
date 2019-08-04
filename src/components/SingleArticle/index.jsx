@@ -12,7 +12,6 @@ class SingleArticle extends Component {
     }
   }
   componentWillMount = () => {
-    console.log(this.props.articles)
     const article = this.props.articles.data.find(article => article.slug === this.props.match.params.slug)
     if(article){
       this.setState({

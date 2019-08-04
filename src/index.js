@@ -4,6 +4,7 @@ import { BrowserRouter, withRouter } from "react-router-dom";
 import React from 'react'
 import authService from "./services/auth";
 import articlesService from "./services/articles";
+import notificationService from "./services/notification";
 import App from "./components/App";
 
 const Main = withRouter((props) => {
@@ -11,6 +12,7 @@ const Main = withRouter((props) => {
         <App
             authService={new authService()}
             articlesService={new articlesService()}
+            notyService={new notificationService()}
             {...props}
         >
 

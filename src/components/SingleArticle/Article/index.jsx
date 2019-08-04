@@ -1,6 +1,7 @@
 
 import React from 'react'
 import { Link } from "react-router-dom";
+import renderHtml from "react-render-html";
 
 const Article = ({
     article
@@ -46,7 +47,7 @@ const Article = ({
             <div className="container">
               <div className="row">
                 <div className="col-12 col-lg-8 offset-lg-2">
-                    {article.content}
+                    {renderHtml(article.content)}
                 </div>
               </div>
               <br />
@@ -54,7 +55,7 @@ const Article = ({
                 <img src={article.imageUrl} alt="..." />
               </p>
               <br />
-              <div className="row">
+              {/* <div className="row">
                 <div className="col-12 col-lg-8 offset-lg-2">
                   <p>Assertively empower customized alignments vis-a-vis go forward vortals. Completely monetize inexpensive alignments
                     whereas market positioning services. Uniquely revolutionize multifunctional strategic theme areas with adaptive
@@ -94,7 +95,7 @@ const Article = ({
                     <Link className="badge badge-pill badge-default" to="#">News</Link>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
           {/*

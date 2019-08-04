@@ -9,6 +9,8 @@ import Footer from "./../Footer";
 import Login from "./../Login";
 import SignUp from "./../SignUp";
 import Auth from "./../Auth";
+import Unauthenticated from "./../Unauthenticated";
+import UserArticles from '../UserArticles';
 
 export default class App extends Component {
     constructor(){
@@ -33,7 +35,15 @@ export default class App extends Component {
             authUser: authUser
         }, () => {
             localStorage.setItem('user', JSON.stringify(authUser))
+            this.props.notyService.success(`Successfully login`)
             this.props.history.push('/')
+        })
+    }
+    removeAuthUser = () => {
+        localStorage.removeItem('user');
+        this.props.notyService.success(`Successfully logged out`)
+        this.setState({
+            authUser: null
         })
     }
     setArticles = (articles) => {
@@ -49,6 +59,7 @@ export default class App extends Component {
                     (location.pathname !== '/auth/login' && location.pathname !== '/auth/signup') &&
                     <Navbar
                         authUser={this.state.authUser}
+                        removeAuthUser={this.removeAuthUser}
                     >
                     </Navbar>
                 }
@@ -67,35 +78,51 @@ export default class App extends Component {
                 >
                 </Route>
                 <Auth
-                    path="articles/create"
+                    path="/articles/create"
                     component={CreateArticle}
                     componentProps={{
                         getArticleCategories: this.props.articlesService.getArticleCategories,
                         createArticle:this.props.articlesService.createArticle,
                         authUser: this.state.authUser ? this.state.authUser : null,
                         categories:this.state.categories,
+                        notyService:this.props.notyService
                     }}
                     isAuthenticated={ this.state.authUser !== null}
                 />
-                <Route 
+                <Auth
+                    path="/user/articles"
+                    component={UserArticles}
+                    componentProps={{
+                        getUserArticles:this.props.articlesService.getUserArticles,
+                        setArticles: this.setArticles,
+                        deleteArticle: this.props.articlesService.deleteArticle,
+                        token:this.state.authUser ? this.state.authUser.token : null
+                    }}
+                    isAuthenticated={this.state.authUser !== null}
+                />
+                
+                <Unauthenticated 
                     path="/auth/login" 
+                    component={Login}
+                    componentProps={{
+                        setAuthUser:this.setAuthUser,
+                        loginUser:this.props.authService.loginUser
+                    }}
+                    isAuthenticated={ this.state.authUser !== null}
+                ></Unauthenticated>
+                <Unauthenticated 
+                    path="/auth/signup" 
+                    component={SignUp}
+                    componentProps={{
+                        registerUser:this.props.authService.registerUser, 
+                        setAuthUser:this.setAuthUser
+                    }}
+                    isAuthenticated={ this.state.authUser !== null}
+                ></Unauthenticated>
+                <Route 
+                    path="/article/:slug" 
+                    exact
                     render={
-                        props => (<Login
-                            {...props}
-                            setAuthUser={this.setAuthUser}
-                            loginUser={this.props.authService.loginUser}
-                        >
-                            
-                        </Login>)
-                    }
-                ></Route>
-                <Route path="/auth/signup" render={
-                    (props) => <SignUp {...props} 
-                    registerUser={this.props.authService.registerUser} 
-                    setAuthUser={this.setAuthUser}>
-                    </SignUp>}>
-                </Route>
-                <Route path="/article/:slug" render={
                     props => (
                         <SingleArticle
                             {...props}
@@ -104,6 +131,20 @@ export default class App extends Component {
                         ></SingleArticle>
                     )
                 }></Route>
+                <Auth
+                    path="/article/edit/:slug"
+                    component={CreateArticle}
+                    componentProps={{
+                        getArticleCategories: this.props.articlesService.getArticleCategories,
+                        createArticle:this.props.articlesService.createArticle,
+                        authUser: this.state.authUser ? this.state.authUser : null,
+                        categories:this.state.categories,
+                        articles:this.state.articles,
+                        updateArticle:this.props.articlesService.updateArticle,
+                        notyService:this.props.notyService
+                    }}
+                    isAuthenticated={this.state.authUser !== null}
+                />
                 {
                     (location.pathname !== '/auth/login' && location.pathname !== '/auth/signup') &&
                     <Footer/>

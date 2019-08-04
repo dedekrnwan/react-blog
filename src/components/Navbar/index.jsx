@@ -2,7 +2,8 @@ import React from 'react'
 import { Link } from "react-router-dom";
 
 const Navbar = ({
-    authUser
+    authUser,
+    removeAuthUser
 }) => {
     return (
         <nav className="topbar topbar-inverse topbar-expand-md topbar-sticky">
@@ -19,9 +20,12 @@ const Navbar = ({
                         <li className="nav-item">
                             <Link to="/" className="nav-link">Root</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link to="/articles/create" className="nav-link">Add new article</Link>
-                        </li>
+                        {
+                            authUser &&
+                            <li className="nav-item">
+                                <Link to="/articles/create" className="nav-link">Add new article</Link>
+                            </li>
+                        }
                         {
                             !authUser &&
                             <li className="nav-item">
@@ -42,8 +46,8 @@ const Navbar = ({
                                     <i className="fa fa-caret-down" />
                                 </Link>
                                 <div className="nav-submenu">
-                                <Link className="nav-link" to="#">My articles</Link>
-                                <Link className="nav-link" to="#">Logout</Link>
+                                <Link className="nav-link" to="/user/articles">My articles</Link>
+                                <Link className="nav-link" to="/" onClick={removeAuthUser}>Logout</Link>
                                 </div>
                             </li>
                         }
